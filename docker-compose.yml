@@ -22,6 +22,7 @@ services:
       args:
         version: 7-apache
     volumes:
-      - ./config:/var/www/config
       - ./html:/var/www/html
       - ./src:/var/www/src
+      - ./tests:/var/www/tests
+      - ./tests/config:/var/www/config

@@ -1,37 +1,39 @@
 {
-  "name": "matthiasmullie/php-api-example",
+  "name": "matthiasmullie/php-api-oauth",
   "type": "project",
-  "description": "An example PHP API",
+  "description": "OAuth API",
   "keywords": [
-    "php", "api", "skeleton", "framework", "example"
+    "oauth", "api"
   ],
-  "homepage": "https://github.com/matthiasmullie/php-api",
+  "homepage": "https://github.com/matthiasmullie/php-api-oauth",
   "license": "MIT",
   "authors": [
     {
       "name": "Matthias Mullie",
       "homepage": "https://www.mullie.eu",
-      "email": "php-api@mullie.eu",
+      "email": "php-api-oauth@mullie.eu",
       "role": "Developer"
     }
   ],
   "require": {
     "php": "^7.0",
     "matthiasmullie/php-api": "^1.0",
-    "symfony/yaml": "^3.2|^4.0"
+    "symfony/yaml": "^3.2|^4.0",
+    "ext-pdo": "*"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.0",
-    "phpunit/phpunit": "~6.0"
+    "phpunit/phpunit": "~6.0",
+    "ext-json": "*"
   },
   "autoload": {
     "psr-4": {
-      "MatthiasMullie\\ApiExample\\": "src/"
+      "MatthiasMullie\\ApiOauth\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "MatthiasMullie\\ApiExample\\Tests\\": "tests/"
+      "MatthiasMullie\\ApiOauth\\Tests\\": "tests/"
     }
   }
 }

@@ -1,0 +1,17 @@
+database:
+  dsn: 'sqlite:/tmp/empty-db.sqlite'
+  username: ''
+  password: ''
+  options: []
+
+application: 'root-app'
+
+scopes:
+  # list of scopes that applications can subscribe to
+  - private
+  - testing
+  # there are 2 other scopes that are always available: 'public' & 'root'
+  # - public is equivalent to access data without access_token, so there's not point
+  #   in applications requesting that scope
+  # - root is for functionality that must exist for the root application, but not
+  #   necessarily for other applications (like creating an application or a user)

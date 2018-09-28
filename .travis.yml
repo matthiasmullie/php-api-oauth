@@ -19,10 +19,10 @@ install:
   - make up PHP=$(phpenv version-name)
 
 script:
-  - make test PHP=$(phpenv version-name) ADAPTER=${ADAPTER} UP=0 DOWN=0
+  - make test PHP=$(phpenv version-name) REQUEST=http UP=0 DOWN=0
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 after_script:
-  - make down PHP=$(phpenv version-name) ADAPTER=${ADAPTER}
+  - make down PHP=$(phpenv version-name)

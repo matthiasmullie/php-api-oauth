@@ -2,6 +2,7 @@
 PHP ?= '7.2'
 UP ?= 1
 DOWN ?= 1
+REQUEST ?= 'default'
 
 install:
 	curl -vs https://getcomposer.org/installer 2>&1 | php
@@ -22,5 +23,5 @@ down:
 
 test:
 	[ $(UP) -eq 1 ] && make up PHP=$(PHP) || true
-	$(eval cmd='docker-compose -f docker-compose.yml -f tests/Docker/docker-compose.$(PHP).yml run client vendor/bin/phpunit')
+	$(eval cmd='docker-compose -f docker-compose.yml -f tests/Docker/docker-compose.$(PHP).yml run client sh -c "REQUEST=$(REQUEST) vendor/bin/phpunit"')
 	eval $(cmd); status=$$?; [ $(DOWN) -eq 1 ] && make down PHP=$(PHP); exit $$status

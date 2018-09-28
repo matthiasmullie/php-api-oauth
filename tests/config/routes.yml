@@ -1,3 +1,65 @@
+# test-only controller used to reset DB in between tests
+'POST /reset':
+  path: /reset
+  handler: MatthiasMullie\ApiOauth\Controllers\Reset\Post
+  methods:
+    POST:
+      query:
+      form_params:
+      responses:
+
+# test-only controller used to simulate authorization
+# (which is otherwise not possible to automate)
+'POST /unsafe-login':
+  path: /unsafe-login
+  handler: MatthiasMullie\ApiOauth\Controllers\Login\UnsafePost
+  methods:
+    POST:
+      query:
+      form_params:
+        client_id:
+          description: Public client id of the root application
+          type: sha1
+          required: true
+        client_secret:
+          description: Secret client id of the root application (do not give out!)
+          type: sha1
+          required: true
+        email:
+          description: Email address of the user logging in
+          type: email
+          required: true
+        password:
+          description: Password of the user logging in
+          type: string
+          required: true
+        scope:
+          description: Comma-separated list of scopes to subscribe to
+          type: string
+          required: true
+      responses:
+        code:
+          description: Unique code to authenticate an application-user relationship
+          type: sha1
+
+'POST /install':
+  path: /install
+  handler: MatthiasMullie\ApiOauth\Controllers\Install\Post
+  methods:
+    POST:
+      query:
+      form_params:
+      responses:
+        application:
+          description: Unique name of the root application
+          type: string
+        client_id:
+          description: Public client id of the root application
+          type: sha1
+        client_secret:
+          description: Secret client id of the root application (do not give out!)
+          type: sha1
+
 'POST /application':
   path: /applications
   handler: MatthiasMullie\ApiOauth\Controllers\Application\Post
