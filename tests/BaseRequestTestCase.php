@@ -2,17 +2,17 @@
 
 namespace MatthiasMullie\ApiOauth\Tests;
 
-use MatthiasMullie\ApiOauth\Validators\ValidatorFactory;
-use MatthiasMullie\ApiOauth\YamlRouteProviderWithContext;
-use GuzzleHttp\Psr7\ServerRequest;
-use MatthiasMullie\Api\RequestHandler;
-use MatthiasMullie\Api\Routes\Providers\RouteProviderInterface;
-use PDO;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Yaml\Yaml;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\ServerRequest;
+use Http\Adapter\Guzzle6\Client as HttpClient;
+use MatthiasMullie\Api\RequestHandler;
+use MatthiasMullie\ApiOauth\Validators\ValidatorFactory;
+use MatthiasMullie\ApiOauth\YamlRouteProviderWithContext;
+use PDO;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Yaml\Yaml;
 
 abstract class BaseRequestTestCase extends TestCase
 {
@@ -60,10 +60,18 @@ abstract class BaseRequestTestCase extends TestCase
             $data['database']['password'],
             $data['database']['options']
         );
+        $mailer = new $data['email']['mailer']['class'](
+            new HttpClient(),
+            ...$data['email']['mailer']['args']
+        );
 
         $routes = new YamlRouteProviderWithContext(
             __DIR__.'/config/routes.yml',
-            array_merge($data, ['database' => $database, 'validators' => new ValidatorFactory()])
+            array_merge($data, [
+                'database' => $database,
+                'mailer' => $mailer,
+                'validators' => new ValidatorFactory(),
+            ])
         );
 
         $handler = new RequestHandler($routes);

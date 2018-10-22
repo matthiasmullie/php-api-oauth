@@ -121,7 +121,7 @@ class LoginTest extends BaseTestCase
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(401, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Invalid client_id or client_secret', $data['reason_phrase']);
+        $this->assertEquals('Invalid: client_id or client_secret', $data['reason_phrase']);
     }
 
     public function testPostInvalidClientSecret()
@@ -140,7 +140,7 @@ class LoginTest extends BaseTestCase
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(401, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
-        $this->assertEquals('Invalid client_id or client_secret', $data['reason_phrase']);
+        $this->assertEquals('Invalid: client_id or client_secret', $data['reason_phrase']);
     }
 
     public function testPostInvalidEmail()

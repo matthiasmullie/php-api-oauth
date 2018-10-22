@@ -1,16 +1,23 @@
+application: 'root-app'
+uri: 'https://localhost'
+email:
+  from: 'info@localhost'
+  mailer:
+    class: '\Stampie\Mailer\SendGrid'
+    args: ['username:password']
+
 database:
   dsn: 'sqlite::memory:'
   username: ''
   password: ''
   options: []
 
-application: 'root-app'
-
 scopes:
   # list of scopes that applications can subscribe to
   - private
-  # there are 2 other scopes that are always available: 'public' & 'root'
+  # there are 3 other scopes that are always available: 'public', 'root' & 'reset-password'
   # - public is equivalent to access data without access_token, so there's not point
   #   in applications requesting that scope
   # - root is for functionality that must exist for the root application, but not
   #   necessarily for other applications (like creating an application or a user)
+  # - reset-password is only for the session to reset the password

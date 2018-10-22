@@ -19,11 +19,6 @@ class Delete extends Base
             throw new NotFoundException('Not Found');
         }
 
-        $session = $this->getSession($get['access_token']);
-        if ($application['user_id'] !== $session['user_id']) {
-            throw new ForbiddenException('Invalid session');
-        }
-
         $this->database->beginTransaction();
 
         $statement = $this->database->prepare(

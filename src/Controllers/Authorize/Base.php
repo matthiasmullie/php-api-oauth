@@ -2,8 +2,7 @@
 
 namespace MatthiasMullie\ApiOauth\Controllers\Authorize;
 
-use League\Route\Http\Exception;
-use PDO;
+use MatthiasMullie\ApiOauth\Controllers\HtmlBase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -17,7 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * the application can obtain a token that can be exchanged for
  * an access token.
  */
-class Base extends \MatthiasMullie\ApiOauth\Controllers\Base
+class Base extends HtmlBase
 {
     /**
      * @var string
@@ -28,35 +27,6 @@ class Base extends \MatthiasMullie\ApiOauth\Controllers\Base
      * @var string
      */
     protected $nonce;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args)
-    {
-        try {
-            $result = $this->invoke($request, $response, $args);
-        } catch (Exception $e) {
-            $result = [
-                'status_code' => $e->getStatusCode(),
-                'body' => $e->getMessage(),
-            ];
-        }
-
-        $response = $response->withHeader('Content-Type', 'text/html;charset=UTF-8');
-
-        if (isset($result['body']) && $response->getBody()->isWritable()) {
-            $response->getBody()->write($result['body']);
-        }
-
-        if (isset($result['headers'])) {
-            foreach ($result['headers'] as $key => $value) {
-                $response = $response->withAddedHeader($key, $value);
-            }
-        }
-
-        return $response->withStatus($result['status_code'] ?? 200);
-    }
 
     /**
      * {@inheritdoc}

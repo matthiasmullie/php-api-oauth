@@ -26,7 +26,7 @@ class Post extends Base
     {
         // validate nonce
         if ($this->previousNonce === '' || $this->previousNonce !== $post['nonce']) {
-            $html = $this->getFormHtml(htmlentities($post['email']), 'Invalid session');
+            $html = $this->getFormHtml(htmlentities($post['email']), 'Invalid nonce');
             throw new BadRequestException($html);
         }
 
@@ -50,7 +50,7 @@ class Post extends Base
         // validate application
         $application = $this->findApplication(['client_id' => $post['client_id']]);
         if (count($application) === 0) {
-            throw new BadRequestException('Invalid client_id');
+            throw new BadRequestException('Invalid: client_id');
         }
 
         try {

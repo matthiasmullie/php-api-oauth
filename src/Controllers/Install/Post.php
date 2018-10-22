@@ -45,6 +45,7 @@ class Post extends Base
                 expiration INT(64) DEFAULT 0
             )',
             'CREATE INDEX idx_applications_user_lookup ON applications (user_id)',
+            'CREATE INDEX idx_users_email_lookup ON users (email)',
             'CREATE INDEX idx_grants_user_application_lookup ON grants (client_id, user_id)',
             'CREATE INDEX idx_grants_refresh_lookup ON grants (refresh_token)',
             'CREATE INDEX idx_session_access_lookup ON sessions (access_token)',

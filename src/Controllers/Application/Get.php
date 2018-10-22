@@ -17,11 +17,6 @@ class Get extends Base
             throw new NotFoundException('Not Found');
         }
 
-        $session = $this->getSession($get['access_token']);
-        if ($application['user_id'] !== $session['user_id']) {
-            throw new ForbiddenException('Invalid session');
-        }
-
         return [
             'application' => $application['application'],
             'client_id' => $application['client_id'],

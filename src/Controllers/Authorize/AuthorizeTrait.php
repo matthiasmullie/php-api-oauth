@@ -8,6 +8,11 @@ use PDO;
 trait AuthorizeTrait
 {
     /**
+     * @var int
+     */
+    public static $expiration = 10 * 60; // valid for 10 minutes
+
+    /**
      * @param string $clientId
      * @param string $userId
      * @param array $scopes
@@ -16,11 +21,12 @@ trait AuthorizeTrait
      */
     protected function authorize(string $clientId, string $userId, array $scopes): string
     {
-        // remove expired, unused grants while we're here...
+        // remove expired, unused grants, scopes & sessions while we're here...
         $statement = $this->database->prepare(
-            'SELECT grant_id
+            'SELECT grants.grant_id
             FROM grants
-            WHERE expiration < :now'
+            LEFT OUTER JOIN sessions ON sessions.grant_id = grants.grant_id AND sessions.expiration >= :now
+            WHERE grants.expiration < :now AND sessions.grant_id IS NULL'
         );
         $statement->execute([':now' => time()]);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -28,6 +34,18 @@ trait AuthorizeTrait
 
         $statement = $this->database->prepare(
             'DELETE FROM grants
+            WHERE grant_id IN (:grant_ids)'
+        );
+        $statement->execute([':grant_ids' => $grantIds]);
+
+        $statement = $this->database->prepare(
+            'DELETE FROM scopes
+            WHERE grant_id IN (:grant_ids)'
+        );
+        $statement->execute([':grant_ids' => $grantIds]);
+
+        $statement = $this->database->prepare(
+            'DELETE FROM sessions
             WHERE grant_id IN (:grant_ids)'
         );
         $statement->execute([':grant_ids' => $grantIds]);
@@ -48,7 +66,7 @@ trait AuthorizeTrait
             ':client_id' => $clientId,
             ':user_id' => $userId,
             ':refresh_token' => $refreshToken,
-            ':expiration' => time() + (10 * 60), // valid for 10 minutes
+            ':expiration' => time() + static::$expiration,
         ]);
 
         $statement = $this->database->prepare(

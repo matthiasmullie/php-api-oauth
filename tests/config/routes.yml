@@ -42,6 +42,26 @@
           description: Unique code to authenticate an application-user relationship
           type: sha1
 
+# test-only controller used to simulate password reset
+# (which is otherwise not possible to automate)
+'GET /unsafe-forgot-password':
+  path: /unsafe-forgot-password
+  handler: MatthiasMullie\ApiOauth\Controllers\ForgotPassword\UnsafeGet
+  methods:
+    GET:
+      query:
+        email:
+          description: Email address to reset the password for
+          type: email
+          required: true
+      responses:
+        user_id:
+          description: Unique user id to reset the password for
+          type: sha1
+        access_token:
+          description: Unique access code to reset the password with
+          type: sha1
+
 'POST /install':
   path: /install
   handler: MatthiasMullie\ApiOauth\Controllers\Install\Post
@@ -415,3 +435,52 @@
           type: sha1
           required: true
           scope: [root]
+
+'GET /forgot-password':
+  path: /forgot-password
+  handler: MatthiasMullie\ApiOauth\Controllers\ForgotPassword\Get
+  methods:
+    GET:
+      query:
+        email:
+          description: Email address to reset the password for
+          type: email
+          required: true
+
+'GET /reset-password':
+  path: /reset-password/{user_id}
+  handler: MatthiasMullie\ApiOauth\Controllers\ResetPassword\Get
+  methods:
+    GET:
+      query:
+        access_token:
+          description: Unique access code
+          type: sha1
+          required: true
+          scope: [reset-password]
+      responses:
+        body:
+          description: HTML body
+          type: string
+
+'POST /reset-password':
+  path: /reset-password/{user_id}
+  handler: MatthiasMullie\ApiOauth\Controllers\ResetPassword\Post
+  methods:
+    POST:
+      query:
+        access_token:
+          description: Unique access code
+          type: sha1
+          required: true
+          scope: [reset-password]
+      form_params:
+        password:
+          description: New password of the user
+          type: string
+          required: true
+          scope: [reset-password]
+      responses:
+        body:
+          description: HTML body
+          type: string

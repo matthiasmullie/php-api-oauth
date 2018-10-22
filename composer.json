@@ -19,7 +19,11 @@
     "php": "^7.0",
     "matthiasmullie/php-api": "^1.0",
     "symfony/yaml": "^3.2|^4.0",
-    "ext-pdo": "*"
+    "ext-pdo": "*",
+    "stampie/stampie": "^1.0",
+    "php-http/message": "^1.7",
+    "guzzlehttp/psr7": "^1.4",
+    "php-http/guzzle6-adapter": "^1.1"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.0",

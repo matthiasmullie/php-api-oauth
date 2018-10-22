@@ -3,6 +3,8 @@
 namespace MatthiasMullie\ApiOauth\Controllers\User;
 
 use MatthiasMullie\ApiOauth\Controllers\Base;
+use MatthiasMullie\ApiOauth\Controllers\Authorize\AuthorizeTrait as Authorize;
+use MatthiasMullie\ApiOauth\Controllers\Authenticate\Post as Authenticate;
 use League\Route\Http\Exception;
 use League\Route\Http\Exception\BadRequestException;
 
@@ -20,7 +22,7 @@ class Post extends Base
             'client_secret' => $post['client_secret'],
         ]);
         if (count($application) === 0) {
-            throw new BadRequestException('Invalid client_id or client_secret');
+            throw new BadRequestException('Invalid: client_id or client_secret');
         }
 
         $user = $this->findUser(['email' => $post['email']]);
@@ -56,7 +58,8 @@ class Post extends Base
         $grantId = hash('sha1', $this->getRandom($post['client_id'] . $data['user_id']));
         $refreshToken = hash('sha1', $this->getRandom($grantId));
         $accessToken = hash('sha1', $this->getRandom($refreshToken));
-        $expiration = time() + (12 * 60 * 60); // valid for 12 hours
+        $expiration = time() + Authenticate::$expiration;
+
 
         // start a session for the main application
         $statement = $this->database->prepare(
@@ -68,7 +71,7 @@ class Post extends Base
             ':client_id' => $post['client_id'],
             ':user_id' => $data['user_id'],
             ':refresh_token' => $refreshToken,
-            ':expiration' => time() + (10 * 60), // valid for 10 minutes
+            ':expiration' => time() + Authorize::$expiration,
         ]);
 
         $statement = $this->database->prepare(

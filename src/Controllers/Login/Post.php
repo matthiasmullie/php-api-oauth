@@ -22,7 +22,7 @@ class Post extends Base
             'client_secret' => $post['client_secret'],
         ]);
         if (count($application) === 0) {
-            throw new UnauthorizedException('Invalid client_id or client_secret');
+            throw new UnauthorizedException('Invalid: client_id or client_secret');
         }
 
         // validate user

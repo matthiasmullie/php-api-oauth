@@ -52,7 +52,7 @@ class YamlRouteProviderWithContext extends YamlRouteProvider
             is_array($data['methods']) &&
             method_exists($data['handler'], '__invoke')
         ) {
-            return new $data['handler']($this->context, $data['methods']);
+            return new $data['handler']($this, $this->context, $data['methods']);
         }
 
         return parent::getHandler($data);

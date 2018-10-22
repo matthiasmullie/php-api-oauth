@@ -11,8 +11,8 @@ use League\Route\Http\Exception\UnauthorizedException;
  * CAUTION!
  * This controller is NOT meant to be exposed, as it would allow applications
  * to capture the user password while they're performing the authentication.
- * A workflow involving AuthorizeForm should be used instead - this one mostly
- * only exists to allow tests to authenticate.
+ * A workflow involving Login\Post should be used instead - this one
+ * only exists to allow tests to login.
  */
 class UnsafePost extends Base
 {
@@ -29,7 +29,7 @@ class UnsafePost extends Base
             'client_secret' => $post['client_secret'],
         ]);
         if (count($application) === 0) {
-            throw new UnauthorizedException('Invalid client_id or client_secret');
+            throw new UnauthorizedException('Invalid: client_id or client_secret');
         }
 
         // validate user

@@ -11,6 +11,11 @@ use PDO;
 class Post extends Base
 {
     /**
+     * @var int
+     */
+    public static $expiration = 12 * 60 * 60; // valid for 12 hours
+
+    /**
      * {@inheritdoc}
      */
     public function post(array $args, array $get, array $post): array
@@ -86,7 +91,6 @@ class Post extends Base
 
         // create the session
         $accessToken = hash('sha1', $this->getRandom($refreshToken));
-        $expiration = time() + (12 * 60 * 60); // valid for 12 hours
         $statement = $this->database->prepare(
             'INSERT INTO sessions (grant_id, access_token, expiration)
             VALUES (:grant_id, :access_token, :expiration)'
@@ -94,7 +98,7 @@ class Post extends Base
         $status = $statement->execute([
             ':grant_id' => $grantId,
             ':access_token' => $accessToken,
-            ':expiration' => $expiration,
+            ':expiration' => time() + static::$expiration,
         ]);
 
         if ($status === false) {
@@ -155,7 +159,6 @@ class Post extends Base
 
         // create new session
         $accessToken = hash('sha1', $this->getRandom($grantId));
-        $expiration = time() + (12 * 60 * 60); // valid for 12 hours
         $statement = $this->database->prepare(
             'INSERT INTO sessions (grant_id, access_token, expiration)
             VALUES (:grant_id, :access_token, :expiration)'
@@ -163,7 +166,7 @@ class Post extends Base
         $statement->execute([
             ':grant_id' => $grantId,
             ':access_token' => $accessToken,
-            ':expiration' => $expiration,
+            ':expiration' => time() + static::$expiration,
         ]);
 
         $status = $this->database->commit();

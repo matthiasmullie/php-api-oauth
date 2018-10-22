@@ -2,16 +2,18 @@
 
 namespace MatthiasMullie\ApiOauth\Controllers;
 
-use MatthiasMullie\ApiOauth\Validators\Exception as ValidatorException;
-use MatthiasMullie\ApiOauth\Validators\ValidatorFactory;
 use League\Route\Http\Exception;
 use League\Route\Http\Exception\BadRequestException;
 use League\Route\Http\Exception\ForbiddenException;
 use League\Route\Http\Exception\MethodNotAllowedException;
 use MatthiasMullie\Api\Controllers\JsonController;
+use MatthiasMullie\Api\Routes\Providers\RouteProviderInterface;
+use MatthiasMullie\ApiOauth\Validators\Exception as ValidatorException;
+use MatthiasMullie\ApiOauth\Validators\ValidatorFactory;
 use PDO;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Stampie\Mailer;
 
 abstract class Base extends JsonController
 {
@@ -26,9 +28,19 @@ abstract class Base extends JsonController
     protected $scopes;
 
     /**
+     * @var string
+     */
+    protected $uri;
+
+    /**
      * @var PDO
      */
     protected $database;
+
+    /**
+     * @var Mailer
+     */
+    protected $mailer;
 
     /**
      * @var ValidatorFactory
@@ -46,19 +58,28 @@ abstract class Base extends JsonController
     protected $methods;
 
     /**
+     * @var RouteProviderInterface
+     */
+    protected $router;
+
+    /**
      * @var array
      */
     protected $sessions;
 
     /**
+     * @param RouteProviderInterface $router
      * @param array $context
      * @param array $methods
      */
-    public function __construct(array $context, array $methods)
+    public function __construct(RouteProviderInterface $router, array $context, array $methods)
     {
+        $this->router = $router;
         $this->context = $context;
         $this->scopes = $context['scopes'];
+        $this->uri = $context['uri'];
         $this->database = $context['database'];
+        $this->mailer = $context['mailer'];
         $this->validators = $context['validators'];
         $this->application = $context['application'];
         $this->methods = $methods;
@@ -123,7 +144,8 @@ abstract class Base extends JsonController
     protected function get(array $args, array $get): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -136,7 +158,8 @@ abstract class Base extends JsonController
     protected function post(array $args, array $get, array $post): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -149,7 +172,8 @@ abstract class Base extends JsonController
     protected function put(array $args, array $get, array $post): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -162,7 +186,8 @@ abstract class Base extends JsonController
     protected function patch(array $args, array $get, array $post): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -175,7 +200,8 @@ abstract class Base extends JsonController
     protected function delete(array $args, array $get, array $post): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -187,7 +213,8 @@ abstract class Base extends JsonController
     protected function head(array $args, array $get): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -199,7 +226,8 @@ abstract class Base extends JsonController
     protected function options(array $args, array $get): array
     {
         // this method needs to be explicitly implemented in a child class
-        throw new MethodNotAllowedException('Method Not Allowed');
+        $allowed = array_keys($this->methods);
+        throw new MethodNotAllowedException($allowed, 'Method Not Allowed');
     }
 
     /**
@@ -433,7 +461,7 @@ abstract class Base extends JsonController
         }
 
         $statement = $this->database->prepare(
-            'SELECT grants.client_id, grants.user_id, sessions.expiration, scopes.scope
+            'SELECT grants.grant_id, grants.client_id, grants.user_id, sessions.expiration, scopes.scope
             FROM sessions
             INNER JOIN grants ON grants.grant_id = sessions.grant_id
             INNER JOIN scopes ON scopes.grant_id = sessions.grant_id
@@ -444,6 +472,7 @@ abstract class Base extends JsonController
         $statement->execute([':access_token' => $accessToken]);
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
         $this->sessions[$accessToken] = $result ? [
+            'grant_id' => $result[0]['grant_id'],
             'client_id' => $result[0]['client_id'],
             'user_id' => $result[0]['user_id'],
             'expires_in' => max(0, $result[0]['expiration'] - time()),
@@ -532,5 +561,36 @@ abstract class Base extends JsonController
         $statement->execute($params);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         return $result ?: [];
+    }
+
+    /**
+     * @param string $handler
+     * @param string $method
+     * @param array $args
+     * @return string
+     * @throws Exception
+     */
+    protected function getUrl(string $handler, string $method, array $args = []): string
+    {
+        foreach ($this->router->getRoutes() as $route) {
+            if (!in_array($method, $route->getMethods())) {
+                continue;
+            }
+
+            if (get_class($route->getHandler()) !== $handler) {
+                continue;
+            }
+
+            $path = $route->getPath();
+
+            // parse named args into the path
+            $path = preg_replace_callback('/\{([^\}]+)\}/', function ($match) use ($args) {
+                return $args[$match[1]] ?? $match[0];
+            }, $path);
+
+            return $this->uri . $path;
+        }
+
+        throw new Exception('Could not generate url for '. $method .' '. $handler);
     }
 }

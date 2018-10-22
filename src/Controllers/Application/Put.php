@@ -19,11 +19,6 @@ class Put extends Base
             throw new NotFoundException('Not Found');
         }
 
-        $session = $this->getSession($get['access_token']);
-        if ($application['user_id'] !== $session['user_id']) {
-            throw new ForbiddenException('Invalid session');
-        }
-
         if (isset($post['application'])) {
             $existing = $this->findApplication(['application' => $post['application']]);
             if (count($existing) > 0) {
