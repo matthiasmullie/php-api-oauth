@@ -1,5 +1,7 @@
 application: 'root-app'
 uri: 'https://localhost'
+template_path: '../templates/'
+
 email:
   from: 'info@localhost'
   mailer:

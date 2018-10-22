@@ -49,19 +49,6 @@ class Post extends Base
             throw new Exception('Unknown error');
         }
 
-        $body = $this->getFormHtml();
-        return ['body' => $body];
-    }
-
-    /**
-     * @return string
-     */
-    public function getFormHtml(): string
-    {
-        return '<html>
-<body>
-<p>Password changed!</p>
-</body>
-</html>';
+        return ['body' => $this->parse('reset-password-confirmation-html')];
     }
 }

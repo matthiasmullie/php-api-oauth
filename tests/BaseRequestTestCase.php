@@ -68,6 +68,7 @@ abstract class BaseRequestTestCase extends TestCase
         $routes = new YamlRouteProviderWithContext(
             __DIR__.'/config/routes.yml',
             array_merge($data, [
+                'template_path' => realpath(__DIR__.'/'.$data['template_path']),
                 'database' => $database,
                 'mailer' => $mailer,
                 'validators' => new ValidatorFactory(),

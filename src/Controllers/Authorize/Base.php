@@ -52,24 +52,15 @@ class Base extends HtmlBase
     }
 
     /**
-     * @param string $user
+     * @param string $email
      * @param string $error
      * @return string
      */
-    public function getFormHtml(string $user = '', string $error = ''): string
+    public function getFormHtml(string $email = '', string $error = ''): string
     {
-        return '<html>
-<body>
-<form method="POST">
-    '.($error ? '<p>' . $error . '</p>' : '').'
-    <label for="email">Email</label>
-    <input id="email" type="email" name="user" value="'. $user .'" placeholder="Email address" required>
-    <label for="password">Password</label>
-    <input id="password" type="password" name="password" required>
-    <input type="hidden" name="nonce" value="'. $this->nonce .'">
-    <input type="submit" value="Authorize">
-</form>
-</body>
-</html>';
+        return $this->parse(
+            'authorize-form-html',
+            ['error' => $error, 'email' => $email, 'nonce' => $this->nonce]
+        );
     }
 }

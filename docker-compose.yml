@@ -9,6 +9,7 @@ services:
     volumes:
       - ./config:/var/www/config
       - ./src:/var/www/src
+      - ./templates:/var/www/templates
       - ./tests:/var/www/tests
       - ./build:/var/www/build
       - ./phpunit.xml.dist:/var/www/phpunit.xml.dist
@@ -24,5 +25,6 @@ services:
     volumes:
       - ./html:/var/www/html
       - ./src:/var/www/src
+      - ./templates:/var/www/templates
       - ./tests:/var/www/tests
       - ./tests/config:/var/www/config

@@ -41,19 +41,12 @@ class Get extends Base
         $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query(['access_token' => $accessToken]);
 
         // prepare email
-        $message = new Message($user['email'], $this->context['email']['from'], 'Password reset request');
-        $message->setHtml(
-            "<html><body>
-<p>Hello {$user['email']},</p>
-<p>Someone has requested a password reset.</p>
-<p>To reset your password, follow this link below: <a href='{$url}'>{$url}</a></p>
-<p>If you did not make the request, please ignore this email, your password won't be changed.</p>
-</body></html>"
-        );
-        $message->setText("Hello {$user['email']}
-Someone has requested a password reset.
-To reset your password, follow this link below: {$url}
-If you did not make the request, please ignore this email, your password won't be changed.");
+        $subject = trim($this->parse('reset-password-email-subject', ['email' => $user['email'], 'url' => $url]));
+        $html = trim($this->parse('reset-password-email-html', ['email' => $user['email'], 'url' => $url]));
+        $plain = trim($this->parse('reset-password-email-plain', ['email' => $user['email'], 'url' => $url]));
+        $message = new Message($user['email'], $this->context['email']['from'], $subject);
+        $message->setHtml($html);
+        $message->setText($plain);
 
         try {
             $this->mailer->send($message);

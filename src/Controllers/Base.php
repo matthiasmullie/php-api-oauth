@@ -33,6 +33,11 @@ abstract class Base extends JsonController
     protected $uri;
 
     /**
+     * @var string
+     */
+    protected $templatePath;
+
+    /**
      * @var PDO
      */
     protected $database;
@@ -78,6 +83,7 @@ abstract class Base extends JsonController
         $this->context = $context;
         $this->scopes = $context['scopes'];
         $this->uri = $context['uri'];
+        $this->templatePath = $context['template_path'];
         $this->database = $context['database'];
         $this->mailer = $context['mailer'];
         $this->validators = $context['validators'];
@@ -592,5 +598,18 @@ abstract class Base extends JsonController
         }
 
         throw new Exception('Could not generate url for '. $method .' '. $handler);
+    }
+
+    /**
+     * @param string $template
+     * @param array $args
+     * @return string
+     */
+    protected function parse(string $template, array $args = []): string
+    {
+        extract($args, EXTR_SKIP);
+        ob_start();
+        require rtrim($this->templatePath, '/') .'/'. $template .'.php';
+        return ob_get_clean();
     }
 }

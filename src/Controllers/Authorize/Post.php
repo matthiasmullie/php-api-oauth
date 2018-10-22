@@ -43,7 +43,7 @@ class Post extends Base
             'password' => hash('sha512', $post['password']),
         ]);
         if (count($user) === 0) {
-            $html = $this->getFormHtml(htmlentities($post['email']), 'Invalid user');
+            $html = $this->getFormHtml($post['email'], 'Invalid user');
             throw new BadRequestException($html);
         }
 
@@ -56,7 +56,7 @@ class Post extends Base
         try {
             $code = $this->authorize($application['client_id'], $user['user_id'], $scopes);
         } catch (Exception $e) {
-            $html = $this->getFormHtml(htmlentities($post['email']), 'Something went wrong, please try again');
+            $html = $this->getFormHtml($post['email'], 'Something went wrong, please try again');
             throw new Exception($html);
         }
 
