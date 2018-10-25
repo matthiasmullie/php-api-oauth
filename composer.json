@@ -1,6 +1,6 @@
 {
   "name": "matthiasmullie/php-api-oauth",
-  "type": "project",
+  "type": "library",
   "description": "OAuth API",
   "keywords": [
     "oauth", "api"
@@ -23,7 +23,8 @@
     "stampie/stampie": "^1.0",
     "php-http/message": "^1.7",
     "guzzlehttp/psr7": "^1.4",
-    "php-http/guzzle6-adapter": "^1.1"
+    "php-http/guzzle6-adapter": "^1.1",
+    "matthiasmullie/path-converter": "^1.1.2"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.0",
@@ -32,7 +33,8 @@
   },
   "autoload": {
     "psr-4": {
-      "MatthiasMullie\\ApiOauth\\": "src/"
+      "MatthiasMullie\\ApiOauth\\": "src/",
+      "MatthiasMullie\\ApiOauth\\TestHelpers\\": "testhelpers/"
     }
   },
   "autoload-dev": {

@@ -5,8 +5,8 @@ services:
     build:
       args:
         version: 7.1-apache
-  server:
-    image: '7.1-server'
+  testserver:
+    image: '7.1-testserver'
     build:
       args:
         version: 7.1-apache

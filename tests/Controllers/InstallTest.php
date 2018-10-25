@@ -2,9 +2,9 @@
 
 namespace MatthiasMullie\ApiOauth\Tests\Controllers;
 
-use MatthiasMullie\Api\TestHelpers\HttpTestCase;
+use MatthiasMullie\ApiOauth\TestHelpers\BaseRequestTestCase;
 
-class InstallTest extends HttpTestCase
+class InstallTest extends BaseRequestTestCase
 {
     public function testInstall()
     {

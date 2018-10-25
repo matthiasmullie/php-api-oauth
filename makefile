@@ -16,12 +16,18 @@ docs:
 	rm apigen.phar
 
 up:
-	docker-compose -f docker-compose.yml -f tests/Docker/docker-compose.$(PHP).yml up -d client server
+	docker-compose -f tests/docker/docker-compose.yml -f tests/docker/docker-compose.$(PHP).yml up -d client testserver
 
 down:
-	docker-compose -f docker-compose.yml -f tests/Docker/docker-compose.$(PHP).yml stop -t0 client server
+	docker-compose -f tests/docker/docker-compose.yml -f tests/docker/docker-compose.$(PHP).yml stop -t0 client testserver
 
 test:
 	[ $(UP) -eq 1 ] && make up PHP=$(PHP) || true
-	$(eval cmd='docker-compose -f docker-compose.yml -f tests/Docker/docker-compose.$(PHP).yml run client sh -c "REQUEST=$(REQUEST) vendor/bin/phpunit"')
+	$(eval cmd='docker-compose -f tests/docker/docker-compose.yml -f tests/docker/docker-compose.$(PHP).yml run client sh -c "REQUEST=$(REQUEST) vendor/bin/phpunit"')
 	eval $(cmd); status=$$?; [ $(DOWN) -eq 1 ] && make down PHP=$(PHP); exit $$status
+
+serve:
+	docker-compose -f docker-compose.yml up -d server
+
+halt:
+	docker-compose -f docker-compose.yml stop -t0 server

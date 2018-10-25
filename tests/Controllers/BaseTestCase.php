@@ -2,7 +2,7 @@
 
 namespace MatthiasMullie\ApiOauth\Tests\Controllers;
 
-use MatthiasMullie\ApiOauth\Tests\BaseRequestTestCase;
+use MatthiasMullie\ApiOauth\TestHelpers\BaseRequestTestCase;
 
 abstract class BaseTestCase extends BaseRequestTestCase
 {

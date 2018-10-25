@@ -2,6 +2,7 @@
 
 namespace MatthiasMullie\ApiOauth\Controllers;
 
+use Http\Adapter\Guzzle6\Client as HttpClient;
 use League\Route\Http\Exception;
 use League\Route\Http\Exception\BadRequestException;
 use League\Route\Http\Exception\ForbiddenException;
@@ -84,11 +85,21 @@ abstract class Base extends JsonController
         $this->scopes = $context['scopes'];
         $this->uri = $context['uri'];
         $this->templatePath = $context['template_path'];
-        $this->database = $context['database'];
-        $this->mailer = $context['mailer'];
         $this->validators = $context['validators'];
         $this->application = $context['application'];
         $this->methods = $methods;
+
+        $this->database = new PDO(
+            $context['database']['dsn'],
+            $context['database']['username'],
+            $context['database']['password'],
+            $context['database']['options']
+        );
+
+        $this->mailer = new $context['email']['mailer']['class'](
+            new HttpClient(),
+            ...$context['email']['mailer']['args']
+        );
     }
 
     /**

@@ -31,14 +31,16 @@ class Message extends \Stampie\Message
     /**
      * @return IdentityInterface|string
      */
-    public function getFrom() {
+    public function getFrom()
+    {
         return $this->from;
     }
 
     /**
      * @return string
      */
-    public function getSubject(): string {
+    public function getSubject(): string
+    {
         return $this->subject;
     }
 }
