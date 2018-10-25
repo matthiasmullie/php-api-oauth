@@ -21,7 +21,7 @@ git clone matthiasmullie/php-api-oauth
 
 ### [config/config.yml](https://github.com/matthiasmullie/php-api-oauth/blob/master/config/config.yml)
 
-This one holds the database credentials & the name of the "default" application.
+This one holds information on the root app, the database & mailer credentials & supported scopes.
 
 ### [config/routes.yml](https://github.com/matthiasmullie/php-api-oauth/blob/master/config/routes.yml)
 
