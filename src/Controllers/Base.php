@@ -365,15 +365,19 @@ abstract class Base extends JsonController
         }, $validation);
 
         foreach ($data as $key => $value) {
-            $type = $types[$key];
-            try {
-                $validator = $this->validators->getValidator($type);
-                if (!$validator->validate($value)) {
-                    throw new BadRequestException('Invalid: '.$key.' must be '.$type);
+            foreach ((array) $types[$key] as $type) {
+                try {
+                    $validator = $this->validators->getValidator($type);
+                    if ($validator->validate($value)) {
+                        continue 2;
+                    }
+                } catch (ValidatorException $e) {
+                    throw new Exception('Internal error: '.$e->getMessage());
                 }
-            } catch (ValidatorException $e) {
-                throw new Exception('Internal error: '.$e->getMessage());
             }
+
+            // this should get skipped once (one of) the validator(s) succeed
+            throw new BadRequestException('Invalid: '.$key.' must be '.implode(', ', (array) $types[$key]));
         }
     }
 
@@ -436,12 +440,16 @@ abstract class Base extends JsonController
         }, $validation);
 
         foreach ($data as $key => $value) {
-            $type = $types[$key];
-            try {
-                $validator = $this->validators->getValidator($type);
-                $data[$key] = $validator->cast($value);
-            } catch (ValidatorException $e) {
-                throw new Exception('Internal error: '.$e->getMessage());
+            foreach ((array) $types[$key] as $type) {
+                try {
+                    $validator = $this->validators->getValidator($type);
+                    if ($validator->validate($value)) {
+                        $data[$key] = $validator->cast($value);
+                        continue 2;
+                    }
+                } catch (ValidatorException $e) {
+                    throw new Exception('Internal error: '.$e->getMessage());
+                }
             }
         }
 
