@@ -308,6 +308,7 @@ abstract class Base extends JsonController
      */
     protected function sanitize(array $data, array $validation, array $scopes): array
     {
+        $data = $this->removeRedundant($data, $validation);
         $data = $this->removeOutOfScope($data, $validation, $scopes);
         $data = $this->castType($data, $validation);
         $data = $this->sort($data, $validation);
@@ -397,12 +398,22 @@ abstract class Base extends JsonController
         }, $validation);
 
         foreach ($data as $key => $value) {
-            if (count(array_intersect($scopes, $requiredScopes[$key])) === 0 && $required[$key] ?? false) {
+            if (count(array_intersect($scopes, $requiredScopes[$key] ?: [])) === 0 && $required[$key] ?? false) {
                 throw new ForbiddenException(
                     'Missing access (required scope: '. implode(',', $requiredScopes[$key]).') for: '.$key
                 );
             }
         }
+    }
+
+    /**
+     * @param array $data
+     * @param array $validation
+     * @return array
+     */
+    protected function removeRedundant(array $data, array $validation): array
+    {
+        return array_intersect_key($data, $validation);
     }
 
     /**
@@ -418,7 +429,7 @@ abstract class Base extends JsonController
         }, $validation);
 
         foreach ($data as $key => $value) {
-            if (count(array_intersect($scopes, $requiredScopes[$key])) === 0) {
+            if (count(array_intersect($scopes, $requiredScopes[$key] ?: [])) === 0) {
                 unset($data[$key]);
             }
         }
