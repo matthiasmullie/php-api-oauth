@@ -145,8 +145,7 @@ abstract class Base extends JsonController
                 throw new MethodNotAllowedException('Method Not Allowed');
         }
 
-        // validate & sanitize outgoing data
-        $this->validate($result, $this->methods[$method]['responses'] ?? [], $scopes);
+        // sanitize outgoing data
         $result = $this->sanitize($result, $this->methods[$method]['responses'] ?? [], $scopes);
 
         return $result;
