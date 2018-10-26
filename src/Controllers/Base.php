@@ -389,16 +389,12 @@ abstract class Base extends JsonController
      */
     protected function validateScope(array $data, array $validation, array $scopes)
     {
-        $required = array_map(function ($data) {
-            return $data['required'] ?? false;
-        }, $validation);
-
         $requiredScopes = array_map(function ($data) {
             return $data['scope'] ?? ['public'];
         }, $validation);
 
         foreach ($data as $key => $value) {
-            if (count(array_intersect($scopes, $requiredScopes[$key] ?: [])) === 0 && $required[$key] ?? false) {
+            if (count(array_intersect($scopes, $requiredScopes[$key])) === 0) {
                 throw new ForbiddenException(
                     'Missing access (required scope: '. implode(',', $requiredScopes[$key]).') for: '.$key
                 );
