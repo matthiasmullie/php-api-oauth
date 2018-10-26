@@ -23,6 +23,7 @@ class ValidatorFactory
             'float' => new FloatValidator(),
             'bool' => new BoolValidator(),
             'array' => new ArrayValidator(),
+            'object' => new ObjectValidator(),
             'alphanumeric' => new AlphanumericValidator(),
             'hexadecimal' => new HexadecimalValidator(),
             'email' => new EmailValidator(),

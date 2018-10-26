@@ -29,6 +29,7 @@ class IntValidatorTest extends ValidatorTestCase
             [[1, 2, 3], false, null],
             [[['test']], false, null],
             [[], false, null],
+            [['a' => 'b'], false, null],
             [1, true, 1],
             [0, true, 0],
             [true, true, 1],

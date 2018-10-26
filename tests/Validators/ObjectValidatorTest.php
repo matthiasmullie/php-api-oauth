@@ -2,17 +2,17 @@
 
 namespace MatthiasMullie\ApiOauth\Tests\Validators;
 
-use MatthiasMullie\ApiOauth\Validators\Sha512Validator;
+use MatthiasMullie\ApiOauth\Validators\ObjectValidator;
 use MatthiasMullie\ApiOauth\Validators\ValidatorInterface;
 
-class Sha512ValidatorTest extends ValidatorTestCase
+class ObjectValidatorTest extends ValidatorTestCase
 {
     /**
      * @inheritdoc
      */
     public function getValidator(): ValidatorInterface
     {
-        return new Sha512Validator();
+        return new ObjectValidator();
     }
 
     /**
@@ -28,8 +28,8 @@ class Sha512ValidatorTest extends ValidatorTestCase
             [['test'], false, null],
             [[1, 2, 3], false, null],
             [[['test']], false, null],
-            [[], false, null],
-            [['a' => 'b'], false, null],
+            [[], true, []],
+            [['a' => 'b'], true, ['a' => 'b']],
             [1, false, null],
             [0, false, null],
             [true, false, null],
@@ -44,7 +44,7 @@ class Sha512ValidatorTest extends ValidatorTestCase
             ['01234567890abcdef01234567890abcdef012345', false, null],
             ['01234567890abcdef01234567890abcdef0123456', false, null],
             ['01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567', false, null],
-            ['01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef012345678', true, '01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef012345678'],
+            ['01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef012345678', false, null],
             ['01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef01234567890abcdef0123456789', false, null],
             ['www.mullie.eu', false, null],
             ['http://www.mullie.eu', false, null],

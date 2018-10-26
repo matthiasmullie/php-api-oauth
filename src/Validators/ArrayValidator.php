@@ -2,6 +2,10 @@
 
 namespace MatthiasMullie\ApiOauth\Validators;
 
+/**
+ * `Array` is an array with just values: non-associative.
+ * Like this, in JSON: ['a', 'b', 'c']
+ */
 class ArrayValidator implements ValidatorInterface
 {
     /**
@@ -9,7 +13,7 @@ class ArrayValidator implements ValidatorInterface
      */
     public function validate($value): bool
     {
-        return is_array($value);
+        return is_array($value) && (count($value) === 0 || array_keys($value) === range(0, count($value) - 1));
     }
 
     /**

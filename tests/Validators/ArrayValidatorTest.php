@@ -29,6 +29,7 @@ class ArrayValidatorTest extends ValidatorTestCase
             [[1, 2, 3], true, [1, 2, 3]],
             [[['test']], true, [['test']]],
             [[], true, []],
+            [['a' => 'b'], false, null],
             [1, false, null],
             [0, false, null],
             [true, false, null],
