@@ -29,6 +29,8 @@ class StringValidatorTest extends ValidatorTestCase
             [[1, 2, 3], false, null],
             [[['test']], false, null],
             [[], false, null],
+            ['["a","b"]', true, '["a","b"]'],
+            ['{"a":"b"}', true, '{"a":"b"}'],
             [['a' => 'b'], false, null],
             [1, true, '1'],
             [0, true, '0'],

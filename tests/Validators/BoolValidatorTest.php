@@ -29,6 +29,8 @@ class BoolValidatorTest extends ValidatorTestCase
             [[1, 2, 3], false, null],
             [[['test']], false, null],
             [[], false, null],
+            ['["a","b"]', false, null],
+            ['{"a":"b"}', false, null],
             [['a' => 'b'], false, null],
             [1, true, true],
             [0, true, false],

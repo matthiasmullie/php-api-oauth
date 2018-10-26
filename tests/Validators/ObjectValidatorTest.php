@@ -29,6 +29,8 @@ class ObjectValidatorTest extends ValidatorTestCase
             [[1, 2, 3], false, null],
             [[['test']], false, null],
             [[], true, []],
+            ['["a","b"]', false, null],
+            ['{"a":"b"}', true, ['a' => 'b']],
             [['a' => 'b'], true, ['a' => 'b']],
             [1, false, null],
             [0, false, null],

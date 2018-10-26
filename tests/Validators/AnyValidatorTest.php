@@ -29,6 +29,8 @@ class AnyValidatorTest extends ValidatorTestCase
             [[1, 2, 3], true, [1, 2, 3]],
             [[['test']], true, [['test']]],
             [[], true, []],
+            ['["a","b"]', true, '["a","b"]'],
+            ['{"a":"b"}', true, '{"a":"b"}'],
             [['a' => 'b'], true, ['a' => 'b']],
             [1, true, '1'],
             [0, true, '0'],

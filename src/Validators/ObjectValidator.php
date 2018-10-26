@@ -15,6 +15,7 @@ class ObjectValidator implements ValidatorInterface
      */
     public function validate($value): bool
     {
+        $value = is_string($value) ? json_decode($value, true) : $value;
         return is_array($value) && (count($value) === 0 || array_keys($value) !== range(0, count($value) - 1));
     }
 
@@ -27,6 +28,6 @@ class ObjectValidator implements ValidatorInterface
             throw new Exception('Not an object');
         }
 
-        return (array) $value;
+        return is_string($value) ? json_decode($value, true) : $value;
     }
 }

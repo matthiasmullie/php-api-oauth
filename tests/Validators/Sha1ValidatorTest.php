@@ -29,6 +29,8 @@ class Sha1ValidatorTest extends ValidatorTestCase
             [[1, 2, 3], false, null],
             [[['test']], false, null],
             [[], false, null],
+            ['["a","b"]', false, null],
+            ['{"a":"b"}', false, null],
             [['a' => 'b'], false, null],
             [1, false, null],
             [0, false, null],
