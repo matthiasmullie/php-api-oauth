@@ -461,6 +461,9 @@ abstract class Base extends JsonController
                     throw new Exception('Internal error: '.$e->getMessage());
                 }
             }
+
+            // this should only error when there's no casting possible
+            throw new Exception('Unable to cast value for '.$key.' ('. json_encode($value) .') to '.implode(', ', (array) $types[$key]));
         }
 
         return $data;

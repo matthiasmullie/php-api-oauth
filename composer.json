@@ -17,9 +17,10 @@
   ],
   "require": {
     "php": "^7.0",
+    "ext-pdo": "*",
+    "ext-json": "*",
     "matthiasmullie/php-api": "^1.0",
     "symfony/yaml": "^3.2|^4.0",
-    "ext-pdo": "*",
     "stampie/stampie": "^1.0",
     "php-http/message": "^1.7",
     "guzzlehttp/psr7": "^1.4",
@@ -28,8 +29,7 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.0",
-    "phpunit/phpunit": "~6.0",
-    "ext-json": "*"
+    "phpunit/phpunit": "~6.0"
   },
   "autoload": {
     "psr-4": {
