@@ -67,7 +67,7 @@ abstract class Generic extends Base
         $status = $statement->execute($params);
 
         if ($status === false || $statement->rowCount() === 0) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         return $data;
@@ -89,7 +89,7 @@ abstract class Generic extends Base
 
         // we didn't get data for all primary keys...
         if (count($pks) !== count($pk)) {
-            throw new Exception('Internal error');
+            throw new Exception(500, 'Internal error: missing primary key(s)');
         }
 
         // fetch existing data & see how it stacks up
@@ -128,7 +128,7 @@ abstract class Generic extends Base
         $status = $statement->execute($params);
 
         if ($status === false || $statement->rowCount() === 0) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         return $data;
@@ -195,7 +195,7 @@ abstract class Generic extends Base
         $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         if ($result === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         if (empty($result)) {

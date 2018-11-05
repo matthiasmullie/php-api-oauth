@@ -102,7 +102,7 @@ class Post extends Base
         ]);
 
         if ($status === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         // figure out what scopes we've authenticated
@@ -171,7 +171,7 @@ class Post extends Base
 
         $status = $this->database->commit();
         if ($status === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         // figure out what scopes we've authenticated

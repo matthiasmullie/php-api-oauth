@@ -95,7 +95,7 @@ class Post extends Base
 
         $result = $this->database->commit();
         if ($result === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         // don't expose password

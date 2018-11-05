@@ -30,7 +30,7 @@ class Get extends Base
         // find root application
         $application = $this->findApplication(['application' => $this->application]);
         if (count($application) === 0) {
-            throw new Exception('No root application');
+            throw new Exception(500, 'Internal error: no root application');
         }
 
         // create a session to reset the access token
@@ -51,7 +51,7 @@ class Get extends Base
         try {
             $this->mailer->send($message);
         } catch (\Exception $e) {
-            throw new Exception('Failed to send email');
+            throw new Exception(500, 'Internal error: failed to send email');
         }
 
         return [];
@@ -110,7 +110,7 @@ class Get extends Base
 
         $status = $this->database->commit();
         if ($status === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         return $accessToken;

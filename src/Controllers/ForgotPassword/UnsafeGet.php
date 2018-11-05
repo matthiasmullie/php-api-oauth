@@ -28,7 +28,7 @@ class UnsafeGet extends Get
         // find root application
         $application = $this->findApplication(['application' => $this->application]);
         if (count($application) === 0) {
-            throw new Exception('No root application');
+            throw new Exception(500, 'Internal error: no root application');
         }
 
         // create a session to reset the access token

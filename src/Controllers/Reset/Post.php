@@ -31,7 +31,7 @@ class Post extends Base
         }
         $status = $this->database->commit();
         if ($status === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         return [];

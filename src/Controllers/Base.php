@@ -372,7 +372,7 @@ abstract class Base extends JsonController
                         continue 2;
                     }
                 } catch (ValidatorException $e) {
-                    throw new Exception('Internal error: '.$e->getMessage());
+                    throw new Exception(500, 'Internal error: '.$e->getMessage());
                 }
             }
 
@@ -454,12 +454,12 @@ abstract class Base extends JsonController
                         continue 2;
                     }
                 } catch (ValidatorException $e) {
-                    throw new Exception('Internal error: '.$e->getMessage());
+                    throw new Exception(500, 'Internal error: '.$e->getMessage());
                 }
             }
 
             // this should only error when there's no casting possible
-            throw new Exception('Unable to cast value for '.$key.' ('. json_encode($value) .') to '.implode(', ', (array) $types[$key]));
+            throw new Exception(500, 'Unable to cast value for '.$key.' ('. json_encode($value) .') to '.implode(', ', (array) $types[$key]));
         }
 
         return $data;
@@ -625,7 +625,7 @@ abstract class Base extends JsonController
             return $this->uri . $path;
         }
 
-        throw new Exception('Could not generate url for '. $method .' '. $handler);
+        throw new Exception(500, 'Could not generate url for '. $method .' '. $handler);
     }
 
     /**

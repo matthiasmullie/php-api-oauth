@@ -46,7 +46,7 @@ class Post extends Base
 
         $result = $statement->execute($params);
         if ($result === false) {
-            throw new Exception('Unknown error');
+            throw new Exception(500, 'Unknown error');
         }
 
         return $data;
