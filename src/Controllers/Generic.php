@@ -57,7 +57,7 @@ abstract class Generic extends Base
         foreach ($data as $column => $value) {
             $columns[] = $column;
             $values[] = ":{$column}";
-            $params[":{$column}"] = $value;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
@@ -109,12 +109,12 @@ abstract class Generic extends Base
 
         foreach ($data as $column => $value) {
             $set[] = "$column = :{$column}";
-            $params[":{$column}"] = $value;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         foreach ($pks as $column => $value) {
             $where[] = "$column = :{$column}";
-            $params[":{$column}"] = $value;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
@@ -152,7 +152,7 @@ abstract class Generic extends Base
 
         foreach ($data as $column => $value) {
             $where[] = "$column = :{$column}";
-            $params[":{$column}"] = $value;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
@@ -182,7 +182,7 @@ abstract class Generic extends Base
 
         foreach ($conditions as $column => $value) {
             $where[] = "$column = :{$column}";
-            $params[":{$column}"] = $value;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
@@ -202,6 +202,10 @@ abstract class Generic extends Base
             throw new NotFoundException('Not Found');
         }
 
-        return $result[0];
+        $result = array_map(function ($value) {
+            return json_decode($value, true) ?: $value;
+        }, $result[0]);
+
+        return $result;
     }
 }
