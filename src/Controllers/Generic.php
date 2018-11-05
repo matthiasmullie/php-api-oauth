@@ -70,7 +70,9 @@ abstract class Generic extends Base
             throw new Exception(500, 'Unknown error');
         }
 
-        return $data;
+        // fetch instead of just returning $data, since there could be more
+        // columns (with default data) in DB
+        return $this->fetch($data);
     }
 
     /**
