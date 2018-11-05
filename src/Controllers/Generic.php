@@ -192,7 +192,7 @@ abstract class Generic extends Base
         );
         $statement->execute($params);
 
-        $result = $statement->fetch(PDO::FETCH_ASSOC);
+        $result = $statement->fetchAll(PDO::FETCH_ASSOC);
 
         if ($result === false) {
             throw new Exception('Unknown error');
@@ -202,6 +202,6 @@ abstract class Generic extends Base
             throw new NotFoundException('Not Found');
         }
 
-        return $result;
+        return $result[0];
     }
 }
