@@ -95,12 +95,11 @@ abstract class Generic extends Base
         // fetch existing data & see how it stacks up
         $existing = $this->fetch($args);
         $scopes = $this->getScopes('PUT', $args, $get, $post);
-        $existing = $this->sanitize($existing, $this->methods['PUT']['form_params'] ?? [], $scopes);
         $data = $this->sanitize($data, $this->methods['PUT']['form_params'] ?? [], $scopes);
-        if ($existing === $data) {
+        if ($this->sanitize($existing, $this->methods['PUT']['form_params'] ?? [], $scopes) === $post) {
             // if there are no changes to the data, we don't even have to execute
             // an update statement...
-            return $data;
+            return array_merge($existing, $data);
         }
 
         $set = [];
@@ -131,7 +130,7 @@ abstract class Generic extends Base
             throw new Exception(500, 'Unknown error');
         }
 
-        return $data;
+        return array_merge($existing, $data);
     }
 
     /**
