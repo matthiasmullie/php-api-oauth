@@ -83,6 +83,40 @@ abstract class Generic extends Base
         $data = array_merge($args, $post);
 
         $table = $this->getTable();
+
+        $columns = [];
+        $values = [];
+        $params = [];
+
+        foreach ($data as $column => $value) {
+            $columns[] = $column;
+            $values[] = ":{$column}";
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
+        }
+
+        $statement = $this->database->prepare(
+            'REPLACE INTO '. $table .'('. implode(', ', $columns) .')
+            VALUES ('. implode(', ', $values) .')'
+        );
+        $status = $statement->execute($params);
+
+        if ($status === false) {
+            throw new Exception(500, 'Unknown error');
+        }
+
+        // fetch instead of just returning $data, since there could be more
+        // columns (with default data) in DB
+        return $this->fetch($data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function patch(array $args, array $get, array $post): array
+    {
+        $data = array_merge($args, $post);
+
+        $table = $this->getTable();
         $pk = $this->getPrimaryKey();
 
         // split up data: $pks will be all primary keys (only used for WHERE),
@@ -96,9 +130,9 @@ abstract class Generic extends Base
 
         // fetch existing data & see how it stacks up
         $existing = $this->fetch($args);
-        $scopes = $this->getScopes('PUT', $args, $get, $post);
-        $data = $this->sanitize($data, $this->methods['PUT']['form_params'] ?? [], $scopes);
-        if ($this->sanitize($existing, $this->methods['PUT']['form_params'] ?? [], $scopes) === $post) {
+        $scopes = $this->getScopes('PATCH', $args, $get, $post);
+        $data = $this->sanitize($data, $this->methods['PATCH']['form_params'] ?? [], $scopes);
+        if (empty($data) || $this->sanitize($existing, $this->methods['PATCH']['form_params'] ?? [], $scopes) === $post) {
             // if there are no changes to the data, we don't even have to execute
             // an update statement...
             return array_merge($existing, $data);
@@ -123,8 +157,6 @@ abstract class Generic extends Base
             SET '. implode(', ', $set) .'
             WHERE '. implode(' AND ', $where)
         );
-
-        $statement->execute($params);
 
         $status = $statement->execute($params);
 

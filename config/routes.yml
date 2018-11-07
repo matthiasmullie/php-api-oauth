@@ -75,6 +75,46 @@
         application:
           description: Unique application name
           type: string
+          required: true
+          scope: [root]
+        user_id:
+          description: Unique user id of the owner of the application
+          type: sha1
+          required: true
+          scope: [root]
+      responses:
+        application:
+          description: Unique application name
+          type: string
+          scope: [root]
+        client_id:
+          description: Public client id of the application
+          type: sha1
+          scope: [root]
+        client_secret:
+          description: Secret client id of the root application (do not give out!)
+          type: sha1
+          scope: [root]
+        user_id:
+          description: User id of the application's owner
+          type: sha1
+          scope: [root]
+
+'PATCH /application/{client_id}':
+  path: /applications/{client_id}
+  handler: MatthiasMullie\ApiOauth\Controllers\Application\Patch
+  methods:
+    PATCH:
+      query:
+        access_token:
+          description: Unique access code
+          type: sha1
+          required: true
+          scope: [root]
+      form_params:
+        application:
+          description: Unique application name
+          type: string
           scope: [root]
         user_id:
           description: Unique user id of the owner of the application
@@ -328,6 +368,37 @@
         email:
           description: New email address of the user
           type: email
+          required: true
+          scope: [root]
+        password:
+          description: New password of the user
+          type: string
+          required: true
+          scope: [root]
+      responses:
+        user_id:
+          description: Unique user id
+          type: sha1
+        email:
+          description: Email address of the user
+          type: email
+          scope: [root, private]
+
+'PATCH /users/{user_id}':
+  path: /users/{user_id}
+  handler: MatthiasMullie\ApiOauth\Controllers\User\Patch
+  methods:
+    PATCH:
+      query:
+        access_token:
+          description: Unique access code
+          type: sha1
+          required: true
+          scope: [root, private]
+      form_params:
+        email:
+          description: New email address of the user
+          type: email
           scope: [root]
         password:
           description: New password of the user
@@ -364,7 +435,6 @@
           description: Email address to reset the password for
           type: email
           required: true
-
 
 'GET /reset-password':
   path: /reset-password/{user_id}

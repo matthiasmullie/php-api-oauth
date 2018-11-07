@@ -7,12 +7,12 @@ use League\Route\Http\Exception\ForbiddenException;
 use League\Route\Http\Exception\NotFoundException;
 use League\Route\Http\Exception\BadRequestException;
 
-class Put extends Base
+class Patch extends Base
 {
     /**
      * @inheritdoc
      */
-    protected function put(array $args, array $get, array $post): array
+    protected function patch(array $args, array $get, array $post): array
     {
         $application = $this->findApplication(['client_id' => $args['client_id']]);
         if (count($application) === 0) {
@@ -37,21 +37,24 @@ class Put extends Base
             }
         }
 
-        $data = array_merge($args, $post);
-        $data['client_secret'] = $application['client_secret'];
+        $data = array_merge($application, $post);
 
-        $columns = [];
-        $values = [];
+        // short-circuit if there are no changes
+        if ($application === $data) {
+            return $data;
+        }
+
+        $sql = [];
         $params = [];
         foreach ($data as $column => $value) {
-            $columns[] = $column;
-            $values[] = ":{$column}";
+            $sql[] = "$column = :{$column}";
             $params[":{$column}"] = $value;
         }
 
         $statement = $this->database->prepare(
-            'REPLACE INTO applications ('. implode(', ', $columns) .')
-            VALUES ('. implode(', ', $values) .')'
+            'UPDATE applications
+            SET '. implode(', ', $sql) .'
+            WHERE client_id = :client_id'
         );
 
         $result = $statement->execute($params);
@@ -59,8 +62,6 @@ class Put extends Base
             throw new Exception(500, 'Unknown error');
         }
 
-        // fetch instead of just returning $data, since there could be more
-        // columns (with default data) in DB
-        return $this->findApplication(['client_id' => $args['client_id']]);
+        return $data;
     }
 }

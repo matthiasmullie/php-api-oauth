@@ -8,12 +8,12 @@ use League\Route\Http\Exception\NotFoundException;
 use League\Route\Http\Exception\BadRequestException;
 use League\Route\Http\Exception\ForbiddenException;
 
-class Put extends Base
+class Patch extends Base
 {
     /**
      * @inheritdoc
      */
-    protected function put(array $args, array $get, array $post): array
+    protected function patch(array $args, array $get, array $post): array
     {
         // user not found
         $user = $this->findUser(['user_id' => $args['user_id']]);
@@ -39,31 +39,30 @@ class Put extends Base
         if (isset($post['password'])) {
             $post['password'] = hash('sha512', $post['password']);
         }
+        $data = array_merge($user, $post);
 
-        $data = array_merge($args, $post);
+        // short-circuit if there are no changes
+        if ($user === $data) {
+            return $data;
+        }
 
-        $columns = [];
-        $values = [];
+        $sql = [];
         $params = [];
         foreach ($data as $column => $value) {
-            $columns[] = $column;
-            $values[] = ":{$column}";
+            $sql[] = "$column = :{$column}";
             $params[":{$column}"] = $value;
         }
 
         $statement = $this->database->prepare(
-            'REPLACE INTO users ('. implode(', ', $columns) .')
-            VALUES ('. implode(', ', $values) .')'
+            'UPDATE users
+            SET '. implode(', ', $sql) .'
+            WHERE user_id = :user_id'
         );
 
         $result = $statement->execute($params);
         if ($result === false) {
             throw new Exception(500, 'Unknown error');
         }
-
-        // fetch instead of just returning $data, since there could be more
-        // columns (with default data) in DB
-        $data = $this->findUser(['user_id' => $args['user_id']]);
 
         // don't expose password
         unset($data['password']);

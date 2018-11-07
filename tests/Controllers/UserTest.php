@@ -6,7 +6,7 @@ class UserTest extends BaseTestCase
 {
     public function testBadMethod()
     {
-        $response = $this->request('PATCH', '/users/new-user@example.com');
+        $response = $this->request('OPTIONS', '/users/new-user@example.com');
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(405, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
@@ -327,7 +327,10 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => $this->rootAccessToken, 'i-dont-exist' => 'some-value'],
-            []
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password')
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(400, $response->getStatusCode());
@@ -341,7 +344,10 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/not-a-valid-user-id',
             ['access_token' => $this->rootAccessToken],
-            ['password' => hash('sha512', 'my-password')]
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(403, $response->getStatusCode());
@@ -355,7 +361,10 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => '1234567890123456789012345678901234567890'],
-            ['password' => hash('sha512', 'my-password')]
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(403, $response->getStatusCode());
@@ -369,7 +378,11 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => $this->rootAccessToken],
-            ['user_id' => 'cant-change-the-user-id']
+            [
+                'user_id' => 'cant-change-the-user-id',
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password')
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(400, $response->getStatusCode());
@@ -396,7 +409,10 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => $this->rootAccessToken],
-            ['email' => 'new-user@example.com']
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(400, $response->getStatusCode());
@@ -425,7 +441,10 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => $accessToken],
-            ['email' => 'non-existing-user@example.com']
+            [
+                'email' => 'non-existing-user@example.com',
+                'password' => hash('sha512', 'my-new-password')
+            ]
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(403, $response->getStatusCode());
@@ -439,6 +458,137 @@ class UserTest extends BaseTestCase
             'PUT',
             '/users/'.$this->userId,
             ['access_token' => $this->rootAccessToken],
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+            ]
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(200, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals($data['email'], 'new-user@example.com');
+        $this->assertArrayNotHasKey('password', $data);
+        $this->assertArrayNotHasKey('access_token', $data);
+    }
+
+    public function testPatchInvalidQueryParameter()
+    {
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => $this->rootAccessToken, 'i-dont-exist' => 'some-value'],
+            []
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(400, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Invalid: i-dont-exist', $data['reason_phrase']);
+    }
+
+    public function testPatchInvalidArg()
+    {
+        $response = $this->request(
+            'PATCH',
+            '/users/not-a-valid-user-id',
+            ['access_token' => $this->rootAccessToken],
+            ['password' => hash('sha512', 'my-password')]
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(403, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Invalid: access_token (invalid user session)', $data['reason_phrase']);
+    }
+
+    public function testPatchWithInvalidSession()
+    {
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => '1234567890123456789012345678901234567890'],
+            ['password' => hash('sha512', 'my-password')]
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(403, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Invalid: access_token (invalid or expired)', $data['reason_phrase']);
+    }
+
+    public function testPatchUpdateUserId()
+    {
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => $this->rootAccessToken],
+            ['user_id' => 'cant-change-the-user-id']
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(400, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Invalid: user_id', $data['reason_phrase']);
+    }
+
+    public function testPatchUpdateDuplicateUser()
+    {
+        // first account creation - should succeed
+        $this->request(
+            'POST',
+            '/users',
+            [],
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+                'client_id' => $this->rootApplicationClientId,
+                'client_secret' => $this->rootApplicationClientSecret,
+            ]
+        );
+
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => $this->rootAccessToken],
+            ['email' => 'new-user@example.com']
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(400, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Email exists', $data['reason_phrase']);
+    }
+
+    public function testPatchUpdateOtherUser()
+    {
+        // first account creation - should succeed
+        $response = $this->request(
+            'POST',
+            '/users',
+            [],
+            [
+                'email' => 'new-user@example.com',
+                'password' => hash('sha512', 'my-new-password'),
+                'client_id' => $this->rootApplicationClientId,
+                'client_secret' => $this->rootApplicationClientSecret,
+            ]
+        );
+        $data = json_decode((string) $response->getBody(), true);
+        $accessToken = $data['access_token'];
+
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => $accessToken],
+            ['email' => 'non-existing-user@example.com']
+        );
+        $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
+        $this->assertEquals(403, $response->getStatusCode());
+        $data = json_decode((string) $response->getBody(), true);
+        $this->assertEquals('Invalid: access_token (invalid user session)', $data['reason_phrase']);
+    }
+
+    public function testPatchUpdateUser()
+    {
+        $response = $this->request(
+            'PATCH',
+            '/users/'.$this->userId,
+            ['access_token' => $this->rootAccessToken],
             ['email' => 'new-user@example.com']
         );
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
@@ -449,10 +599,10 @@ class UserTest extends BaseTestCase
         $this->assertArrayNotHasKey('access_token', $data);
     }
 
-    public function testPutUpdatePassword()
+    public function testPatchUpdatePassword()
     {
         $response = $this->request(
-            'PUT',
+            'PATCH',
             '/users/'.$this->userId,
             ['access_token' => $this->rootAccessToken],
             ['password' => hash('sha512', 'my-new-password')]
