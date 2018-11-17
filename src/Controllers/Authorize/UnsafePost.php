@@ -1,8 +1,7 @@
 <?php
 
-namespace MatthiasMullie\ApiOauth\Controllers\Login;
+namespace MatthiasMullie\ApiOauth\Controllers\Authorize;
 
-use MatthiasMullie\ApiOauth\Controllers\Authorize\AuthorizeTrait;
 use MatthiasMullie\ApiOauth\Controllers\Base;
 use League\Route\Http\Exception\BadRequestException;
 use League\Route\Http\Exception\UnauthorizedException;
@@ -49,9 +48,6 @@ class UnsafePost extends Base
         }
 
         $code = $this->authorize($application['client_id'], $user['user_id'], $scopes);
-
-        return [
-            'code' => $code,
-        ];
+        return ['code' => $code];
     }
 }

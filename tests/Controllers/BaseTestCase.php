@@ -57,10 +57,10 @@ abstract class BaseTestCase extends BaseRequestTestCase
         $this->testApplicationClientId = $data['client_id'];
         $this->testApplicationClientSecret = $data['client_secret'];
 
-        // authorize test user for test application
+        // authorize & authenticate test user for test application
         $response = $this->request(
             'POST',
-            '/unsafe-login',
+            '/unsafe-authorize',
             [],
             [
                 'client_id' => $this->testApplicationClientId,

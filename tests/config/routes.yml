@@ -10,9 +10,9 @@
 
 # test-only controller used to simulate authorization
 # (which is otherwise not possible to automate)
-'POST /unsafe-login':
-  path: /unsafe-login
-  handler: MatthiasMullie\ApiOauth\Controllers\Login\UnsafePost
+'POST /unsafe-authorize':
+  path: /unsafe-authorize
+  handler: MatthiasMullie\ApiOauth\Controllers\Authorize\UnsafePost
   methods:
     POST:
       query:
@@ -324,9 +324,21 @@
           type: string
           required: true
       responses:
-        code:
-          description: Unique code to authenticate an application-user relationship
+        access_token:
+          description: Unique code identifying an application-user relationship, required to access/update relevant data
           type: sha1
+        issued_at:
+          description: Timestamp when access_token was issued
+          type: int
+        expires_in:
+          description: Amount of seconds left until access_token expires
+          type: int
+        refresh_token:
+          description: Unique code to generate a new access_token when the previous one has expired
+          type: sha1
+        scope:
+          description: Scopes that have been authenticated
+          type: array
 
 'POST /authenticate':
   path: /authenticate

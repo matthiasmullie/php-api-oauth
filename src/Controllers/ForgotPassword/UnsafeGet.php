@@ -32,11 +32,12 @@ class UnsafeGet extends Get
         }
 
         // create a session to reset the access token
-        $accessToken = $this->createSession($application['client_id'], $user['user_id'], ['reset-password']);
+        $code = $this->authorize($application['client_id'], $user['user_id'], ['reset-password']);
+        $authentication = $this->authenticate($application['client_id'], $application['client_secret'], $code);
 
         return [
             'user_id' => $user['user_id'],
-            'access_token' => $accessToken,
+            'access_token' => $authentication['access_token'],
         ];
     }
 }

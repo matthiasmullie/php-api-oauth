@@ -10,7 +10,7 @@ trait AuthorizeTrait
     /**
      * @var int
      */
-    public static $expiration = 10 * 60; // valid for 10 minutes
+    public static $authorizeExpiration = 10 * 60; // valid for 10 minutes
 
     /**
      * @param string $clientId
@@ -54,7 +54,7 @@ trait AuthorizeTrait
         $grantId = hash('sha1', $this->getRandom($clientId . $userId));
         $refreshToken = hash('sha1', $this->getRandom($grantId));
 
-        // initiate session
+        // initiate grant
         $this->database->beginTransaction();
 
         $statement = $this->database->prepare(
@@ -66,7 +66,7 @@ trait AuthorizeTrait
             ':client_id' => $clientId,
             ':user_id' => $userId,
             ':refresh_token' => $refreshToken,
-            ':expiration' => time() + static::$expiration,
+            ':expiration' => time() + static::$authorizeExpiration,
         ]);
 
         $statement = $this->database->prepare(

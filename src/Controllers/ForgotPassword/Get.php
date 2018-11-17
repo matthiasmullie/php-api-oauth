@@ -3,14 +3,17 @@
 namespace MatthiasMullie\ApiOauth\Controllers\ForgotPassword;
 
 use League\Route\Http\Exception;
-use MatthiasMullie\ApiOauth\Controllers\Authorize\AuthorizeTrait as Authorize;
-use MatthiasMullie\ApiOauth\Controllers\Authenticate\Post as Authenticate;
+use MatthiasMullie\ApiOauth\Controllers\Authenticate\AuthenticateTrait;
+use MatthiasMullie\ApiOauth\Controllers\Authorize\AuthorizeTrait;
 use MatthiasMullie\ApiOauth\Controllers\Base;
 use League\Route\Http\Exception\NotFoundException;
 use MatthiasMullie\ApiOauth\Email\Message;
 
 class Get extends Base
 {
+    use AuthorizeTrait;
+    use AuthenticateTrait;
+
     /**
      * @var string
      */
@@ -34,11 +37,12 @@ class Get extends Base
         }
 
         // create a session to reset the access token
-        $accessToken = $this->createSession($application['client_id'], $user['user_id'], ['reset-password']);
+        $code = $this->authorize($application['client_id'], $user['user_id'], ['reset-password']);
+        $authentication = $this->authenticate($application['client_id'], $application['client_secret'], $code);
 
         // build link to reset-password form
         $url = $this->getUrl($this->resetPasswordHandler, 'GET', ['user_id' => $user['user_id']]);
-        $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query(['access_token' => $accessToken]);
+        $url .= (strpos($url, '?') === false ? '?' : '&') . http_build_query(['access_token' => $authentication['access_token']]);
 
         // prepare email
         $subject = trim($this->parse('reset-password-email-subject', ['email' => $user['email'], 'url' => $url]));
@@ -55,64 +59,5 @@ class Get extends Base
         }
 
         return [];
-    }
-
-    /**
-     * @param string $clientId
-     * @param string $userId
-     * @param array $scopes
-     * @return string
-     * @throws Exception
-     */
-    protected function createSession(string $clientId, string $userId, array $scopes): string
-    {
-        // generate code & refresh token
-        $grantId = hash('sha1', $this->getRandom($clientId . $userId));
-        $refreshToken = hash('sha1', $this->getRandom($grantId));
-
-        // initiate session
-        $this->database->beginTransaction();
-
-        $statement = $this->database->prepare(
-            'INSERT INTO grants (grant_id, client_id, user_id, refresh_token, expiration)
-            VALUES (:grant_id, :client_id, :user_id, :refresh_token, :expiration)'
-        );
-        $statement->execute([
-            ':grant_id' => $grantId,
-            ':client_id' => $clientId,
-            ':user_id' => $userId,
-            ':refresh_token' => $refreshToken,
-            ':expiration' => Authorize::$expiration,
-        ]);
-
-        $statement = $this->database->prepare(
-            'INSERT INTO scopes (grant_id, scope)
-            VALUES (:grant_id, :scope)'
-        );
-        foreach ($scopes as $scope) {
-            $statement->execute([
-                ':grant_id' => $grantId,
-                ':scope' => $scope,
-            ]);
-        }
-
-        // create the session
-        $accessToken = hash('sha1', $this->getRandom($refreshToken));
-        $statement = $this->database->prepare(
-            'INSERT INTO sessions (grant_id, access_token, expiration)
-            VALUES (:grant_id, :access_token, :expiration)'
-        );
-        $statement->execute([
-            ':grant_id' => $grantId,
-            ':access_token' => $accessToken,
-            ':expiration' => time() + Authenticate::$expiration,
-        ]);
-
-        $status = $this->database->commit();
-        if ($status === false) {
-            throw new Exception(500, 'Unknown error');
-        }
-
-        return $accessToken;
     }
 }

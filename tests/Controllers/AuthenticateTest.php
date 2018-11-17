@@ -35,7 +35,7 @@ class AuthenticateTest extends BaseTestCase
         // authorize new user for test application
         $response = $this->request(
             'POST',
-            '/unsafe-login',
+            '/unsafe-authorize',
             [],
             [
                 'client_id' => $this->testApplicationClientId,

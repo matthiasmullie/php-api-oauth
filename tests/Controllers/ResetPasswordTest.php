@@ -167,7 +167,7 @@ class ResetPasswordTest extends BaseTestCase
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(200, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
-        $this->assertArrayHasKey('code', $data);
+        $this->assertArrayHasKey('access_token', $data);
     }
 
     public function testPostNewPasswordSameTokenTwice()

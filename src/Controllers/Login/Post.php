@@ -2,6 +2,7 @@
 
 namespace MatthiasMullie\ApiOauth\Controllers\Login;
 
+use MatthiasMullie\ApiOauth\Controllers\Authenticate\AuthenticateTrait;
 use MatthiasMullie\ApiOauth\Controllers\Authorize\AuthorizeTrait;
 use MatthiasMullie\ApiOauth\Controllers\Base;
 use League\Route\Http\Exception\UnauthorizedException;
@@ -9,6 +10,7 @@ use League\Route\Http\Exception\UnauthorizedException;
 class Post extends Base
 {
     use AuthorizeTrait;
+    use AuthenticateTrait;
 
     /**
      * {@inheritdoc}
@@ -35,11 +37,7 @@ class Post extends Base
         }
 
         $scopes = ['root'];
-
         $code = $this->authorize($application['client_id'], $user['user_id'], $scopes);
-
-        return [
-            'code' => $code,
-        ];
+        return $this->authenticate($application['client_id'], $application['client_secret'], $code);
     }
 }
