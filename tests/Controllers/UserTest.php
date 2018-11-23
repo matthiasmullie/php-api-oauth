@@ -319,6 +319,7 @@ class UserTest extends BaseTestCase
         $this->assertEquals(200, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
         $this->assertArrayHasKey('access_token', $data);
+        $this->assertArrayHasKey('user_id', $data);
     }
 
     public function testPutInvalidQueryParameter()

@@ -38,6 +38,11 @@ class Post extends Base
 
         $scopes = ['root'];
         $code = $this->authorize($application['client_id'], $user['user_id'], $scopes);
-        return $this->authenticate($application['client_id'], $application['client_secret'], $code);
+        $authentication = $this->authenticate($application['client_id'], $application['client_secret'], $code);
+
+        // don't expose password
+        unset($user['password']);
+
+        return array_merge($user, $authentication);
     }
 }

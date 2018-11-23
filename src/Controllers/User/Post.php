@@ -32,11 +32,14 @@ class Post extends Base
             throw new BadRequestException('Email exists');
         }
 
-        $data = [
-            'user_id' => hash('sha1', $this->getRandom($post['email'])),
-            'email' => $post['email'],
-            'password' => hash('sha512', $post['password']),
-        ];
+        $data = array_merge(
+            $post,
+            [
+                'user_id' => hash('sha1', $this->getRandom($post['email'])),
+                'password' => hash('sha512', $post['password']),
+            ]
+        );
+        unset($data['client_id'], $data['client_secret']);
 
         $columns = [];
         $values = [];
@@ -58,6 +61,9 @@ class Post extends Base
         $scopes = ['root'];
         $code = $this->authorize($post['client_id'], $data['user_id'], $scopes);
         $authentication = $this->authenticate($post['client_id'], $post['client_secret'], $code);
+
+        // fetch stored user data
+        $data = $this->findUser(['user_id' => $data['user_id']]);
 
         // don't expose password
         unset($data['password']);

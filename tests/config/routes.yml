@@ -324,6 +324,12 @@
           type: string
           required: true
       responses:
+        user_id:
+          description: Unique user id
+          type: sha1
+        email:
+          description: Email address of the user
+          type: email
         access_token:
           description: Unique code identifying an application-user relationship, required to access/update relevant data
           type: sha1

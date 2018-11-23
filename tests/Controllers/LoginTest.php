@@ -197,6 +197,7 @@ class LoginTest extends BaseTestCase
         $this->assertArraySubset(['Content-Type' => ['application/json']], $response->getHeaders());
         $this->assertEquals(200, $response->getStatusCode());
         $data = json_decode((string) $response->getBody(), true);
+        $this->assertArrayHasKey('user_id', $data);
         $this->assertArrayHasKey('access_token', $data);
         $this->assertArrayHasKey('issued_at', $data);
         $this->assertArrayHasKey('expires_in', $data);
