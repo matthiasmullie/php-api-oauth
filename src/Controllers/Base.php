@@ -308,6 +308,7 @@ abstract class Base extends JsonController
      */
     protected function sanitize(array $data, array $validation, array $scopes): array
     {
+        $data = $this->addDefaults($data, $validation);
         $data = $this->removeRedundant($data, $validation);
         $data = $this->removeOutOfScope($data, $validation, $scopes);
         $data = $this->castType($data, $validation);
@@ -400,6 +401,23 @@ abstract class Base extends JsonController
                 );
             }
         }
+    }
+
+    /**
+     * @param array $data
+     * @param array $validation
+     * @return array
+     */
+    protected function addDefaults(array $data, array $validation): array
+    {
+        $defaults = array_map(function ($data) {
+            return $data['default'] ?? null;
+        }, $validation);
+        $defaults = array_filter($defaults, function ($value) {
+            return $value !== null;
+        });
+
+        return array_merge($defaults, $data);
     }
 
     /**
