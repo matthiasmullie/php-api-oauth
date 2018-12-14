@@ -47,10 +47,10 @@ class Patch extends Base
         }
 
         $sql = [];
-        $params = [];
-        foreach ($data as $column => $value) {
+        $params = [':user_id' => $user['user_id']];
+        foreach ($post as $column => $value) {
             $sql[] = "$column = :{$column}";
-            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(

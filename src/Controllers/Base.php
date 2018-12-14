@@ -579,7 +579,7 @@ abstract class Base extends JsonController
         $params = [];
         foreach ($conditions as $column => $value) {
             $sql[] = "{$column} = :{$column}";
-            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
@@ -602,7 +602,7 @@ abstract class Base extends JsonController
         $params = [];
         foreach ($conditions as $column => $value) {
             $sql[] = "{$column} = :{$column}";
-            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(

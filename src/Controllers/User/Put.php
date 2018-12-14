@@ -48,7 +48,7 @@ class Put extends Base
         foreach ($data as $column => $value) {
             $columns[] = $column;
             $values[] = ":{$column}";
-            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);;
+            $params[":{$column}"] = !is_array($value) ? $value : json_encode($value);
         }
 
         $statement = $this->database->prepare(
