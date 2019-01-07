@@ -12,11 +12,6 @@ use Psr\Http\Message\ResponseInterface;
 abstract class BaseRequestTestCase extends TestCase
 {
     /**
-     * @var string
-     */
-    protected $configPath = __DIR__.'/../config/';
-
-    /**
      * @param string $method
      * @param string $uri
      * @param array  $get
@@ -46,12 +41,15 @@ abstract class BaseRequestTestCase extends TestCase
      * @param array  $post
      *
      * @return ResponseInterface
-     *
-     * @throws \MatthiasMullie\Api\Routes\Providers\Exception
      */
     public function internalRequest($method, $uri, array $get = [], array $post = [])
     {
-        $handler = new RequestHandlerFromConfig($this->configPath);
+        global $handler;
+
+        // multiple requests would cause "Cannot register two routes matching ...",
+        // so we need to re-init the routes for every request
+        require __DIR__.'/../bootstrap.php';
+
         $request = new ServerRequest($method, $uri);
         $request = $request
             ->withQueryParams($get)

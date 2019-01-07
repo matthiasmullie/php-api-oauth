@@ -7,6 +7,7 @@ services:
       args:
         version: 7-apache
     volumes:
+      - ../../bootstrap.php:/var/www/bootstrap.php
       - ../config:/var/www/config
       - ../../src:/var/www/src
       - ../../testhelpers:/var/www/testhelpers
@@ -24,6 +25,7 @@ services:
       args:
         version: 7-apache
     volumes:
+      - ../../bootstrap.php:/var/www/bootstrap.php
       - ../config:/var/www/config
       - ../../html:/var/www/html
       - ../../src:/var/www/src

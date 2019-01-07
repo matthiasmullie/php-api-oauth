@@ -1,11 +1,9 @@
 <?php
 
 use GuzzleHttp\Psr7\ServerRequest;
-use MatthiasMullie\ApiOauth\RequestHandlerFromConfig;
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../bootstrap.php';
 
-$handler = new RequestHandlerFromConfig();
 $request = ServerRequest::fromGlobals();
 // ServerRequest's parsedBody gets filled from $_POST, but that isn't set for PUT requests etc...
 parse_str((string) $request->getBody(), $post);
