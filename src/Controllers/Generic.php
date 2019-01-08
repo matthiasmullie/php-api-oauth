@@ -236,7 +236,8 @@ abstract class Generic extends Base
         }
 
         $result = array_map(function ($value) {
-            return json_decode($value, true) ?: $value;
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : $value;
         }, $result[0]);
 
         return $result;
